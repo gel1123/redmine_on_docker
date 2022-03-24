@@ -1,0 +1,38 @@
+version: '3.7'
+services:
+    redmine:
+        container_name: redmine
+        image: redmine
+        restart: always
+        ports:
+            - 3001:3000
+        volumes:
+            - ./Redmine/plugins:/usr/src/redmine/plugins
+            - ./Redmine/themes:/usr/src/redmine/public/themes
+        environment:
+            REDMINE_DB_POSTGRES: redmine-db
+            REDMINE_DB_DATABASE: redmine
+            REDMINE_DB_USERNAME: redmine
+            REDMINE_DB_PASSWORD: redmine
+            TZ: Asia/Tokyo
+
+    redmine-db:
+        container_name: redmine-db
+        image: postgres
+        restart: always
+        volumes:
+            - ./postgres/db-data:/var/lib/postgresql/data
+            - ./postgres/initdb:/docker-entrypoint-initdb.d
+        environment:
+            POSTGRES_ROOT_PASSWORD: postgres
+            POSTGRES_USER: redmine
+            POSTGRES_PASSWORD: redmine
+            POSTGRES_DATABASE: redmine
+            TZ: Asia/Tokyo
+# 参考にさせていただいた記事：
+#     https://blog.hiros-dot.net/?p=9007#toc3
+#     https://qiita.com/piro87084806/items/76a95eff3a1bb17cae81
+# redmineを起動するなら、このymlを置いたディレクトリで "docker-compose up -d" を実行すること（-dはマルチタスクとしての実行を指定するオプション）
+# redmineのデフォルトのuser/passwordは「admin/admin」
+# 停止は "docker-compose down"
+# なお個人的な事情によりホストのport3000は別のサービス用に開けておきたいので、3001に設定している
